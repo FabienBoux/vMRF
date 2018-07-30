@@ -2,17 +2,19 @@
 addpath(genpath(fullfile(pwd, 'functions')))
 
 % Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-file_grid   	= 'files/multidico/2018-07-25-13:41_complex_dico.mat';
-file_regression	= 'files/multidico/2018-07-25-11:22_complex_dico.mat';
+file_grid   	= 'dictionaries/multidico/2018-07-25-13:41_complex_dico.mat';
+file_regression	= 'dictionaries/multidico/2018-07-25-11:22_complex_dico.mat';
 
-cstr.Sigma      = '';
+cstr.Sigma      = 'd';
 Lw              = 1;
 
 coord           = [1 2 3];
 seq_sizes       = [32 32 30];
-snr_values      = 200;
 signal_test     = 100;
 nb_tests        = 100;
+
+snr_train       = [0 inf];
+snr_test        = [0 inf];
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Load dico
@@ -49,6 +51,7 @@ for seq = 1:size(mat,1)
     
     % Select trainning data and train model
     Xtrain              = Xregr(:,nmat(seq,:));
+    Xtrain              = AddNoise(Xtrain, snr_train(1)+(snr_train(2)-snr_train(1))*rand(size(Xtrain,1),1), 0);
     Ytrain              = Yregr;
     [theta, ~]          = EstimateInverseFunction(Ytrain, Xtrain, 20, Lw, 100, cstr, 0);
     
@@ -57,7 +60,7 @@ for seq = 1:size(mat,1)
         rand_perm           = randperm(length(Xregr), signal_test);
         Xtest               = Xregr(rand_perm, nmat(seq,:));
         Ytest               = Yregr(rand_perm, :);
-        Xtest               = AddNoise(Xtest , snr_values, 0);
+        Xtest               = AddNoise(Xtest , snr_test(1)+(snr_test(2)-snr_test(1))*rand(size(Xtest,1),1), 0);
 
         % Prediction
         Ypredict_grid       = EstimateParametersFromGrid(Xtest, Xgrid, Ygrid);
@@ -76,6 +79,17 @@ end
 
 %%
 
-
+figure;
+for i =1:size(Nrmse_grid,1)
+    subplot(size(Nrmse_grid,1),2,2*i-1)
+    hist(squeeze(Nrmse_grid(i,:,:)), 0:0.01:1.2)
+    xlim([0 1.2])
+    if i==1, title('Grid'); end
+        
+    subplot(size(Nrmse_grid,1),2,2*i)
+    hist(squeeze(Nrmse_regr(i,:,:)), 0:0.01:1.2)
+    xlim([0 1.2])
+    if i==1, title('Regression'); end
+end
 
 
