@@ -1,0 +1,19 @@
+# This file contains the sequence parameters
+%
+% Each line which starts by Seq. will be read by VoxelSim.m
+
+
+####################
+##    Sequence    ##
+####################
+
+Seq.Id          	=   'MSME';
+Seq.Name        	=   '@Seq_nRF';
+Seq.Tacq        	=   [6:6:180]*1e-3;
+Seq.TR          	=   200e-3;
+Seq.RF.exc.time     =   [0 3:6:177]*1e-3 ;
+Seq.RF.exc.dur      =   [1 zeros(1,30)]*1e-3;
+Seq.RF.exc.ang      =   [90 180*ones(1,30)];
+Seq.RF.exc.pha0     =   [0 90*ones(1,30)];
+Seq.RF.exc.phainc   =   [0];
+Seq.NbRep           =   1;

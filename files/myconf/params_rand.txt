@@ -1,0 +1,14 @@
+
+
+Model.geo.res       = [64];
+Model.geo.vasc.N    = [20];
+
+nb_signal = 20*20*10*10;
+Model.geo.vasc.Vf   = repmat(0.01 + 0.24 *rand(1,nb_signal), 1,2);
+Model.geo.vasc.R    = repmat([1 + 10 *rand(1,nb_signal)]*1e-6, 1,2);
+Model.phy.vasc.T2   = repmat([40 + 200 *rand(1,nb_signal)]*1e-3, 1,2);
+
+Model.phy.B0        = [9.4];
+Model.phy.DH2O      = repmat([500 + 900 *rand(1,nb_signal)]*1e-12, 1,2);
+
+Model.phy.vasc.khi  = [0.4*ones(1,nb_signal) 0.54*ones(1,nb_signal)]*1e-6;

@@ -1,0 +1,19 @@
+# This file contains the sequence parameters
+%
+% Each line which starts by Seq. will be read by VoxelSim.m
+
+
+####################
+##    Sequence    ##
+####################
+
+Seq.Id          	=   'GESFIDE';
+Seq.Name        	=   '@Seq_nRF';
+Seq.Tacq        	=   [2.5820453  5.349651 8.117256 10.884862 13.652467 16.420073 19.187677 21.955284 30.960127 33.727734 36.49534 39.262943 42.03055 44.798153 47.56576 50.333366 53.10097 55.868576 58.63618 61.403786 64.171394 66.938995 69.706604 72.474205 75.24181 78.00942 80.77702 83.54463  86.31223 89.07984 91.84745 94.61505]*1e-3;
+Seq.TR          	=   4000e-3;
+Seq.RF.exc.time     =   [0 25]*1e-3; %default [0 50]*1e-3
+Seq.RF.exc.dur      =   [20 2]*1e-3; %default [20 2]*1e-3
+Seq.RF.exc.ang      =   [90 180];
+Seq.RF.exc.pha0     =   [0 90];
+Seq.RF.exc.phainc   =   [0];
+Seq.NbRep           =   1;
