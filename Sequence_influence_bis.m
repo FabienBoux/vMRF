@@ -4,11 +4,12 @@ addpath(genpath(fullfile(pwd, 'functions')))
 % Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 file_grid   	= 'dictionaries/multidico/2018-07-25-13:41_complex_dico.mat';
 file_regression	= 'dictionaries/multidico/2018-07-25-11:22_complex_dico.mat';
+seq_names       = {'GEFIDSE','MGE','MSME'};
 
 cstr.Sigma      = 'd';
 Lw              = 1;
 
-coord           = [1 2 3];
+coord           = [1 2 3 4];
 seq_sizes       = [32 32 30];
 signal_test     = 100;
 nb_tests        = 100;
@@ -80,16 +81,28 @@ end
 %%
 
 figure;
-for i =1:size(Nrmse_grid,1)
+for i = 1:size(Nrmse_grid,1)
     subplot(size(Nrmse_grid,1),2,2*i-1)
-    hist(squeeze(Nrmse_grid(i,:,:)), 0:0.01:1.2)
-    xlim([0 1.2])
-    if i==1, title('Grid'); end
-        
+    hist(squeeze(Nrmse_grid(i,:,:)), 0:0.01:1.4)
+    xlim([0 1.4])
+    hold on; line([1 1], ylim, 'LineWidth', 1.5, 'Color', 'k');
+    if i == 1
+        title('NRMSE histogram - Grid search method');
+        legend({'BVf','VSI','T2','ADC','Limit of interest'})
+        ylabel(seq_names)
+    else
+        ylabel(mat(i,:))
+    end
+    
+    
     subplot(size(Nrmse_grid,1),2,2*i)
-    hist(squeeze(Nrmse_regr(i,:,:)), 0:0.01:1.2)
-    xlim([0 1.2])
-    if i==1, title('Regression'); end
+    hist(squeeze(Nrmse_regr(i,:,:)), 0:0.01:1.4)
+    xlim([0 1.4])
+    hold on; line([1 1], ylim, 'LineWidth', 1.5, 'Color', 'k');
+    if i == 1
+        title('NRMSE histogram - Learning method');
+        legend({'BVf','VSI','T2','ADC',x_dens'Limit of interest'})
+    end
 end
 
 
