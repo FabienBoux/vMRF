@@ -175,7 +175,8 @@ xbvf        = 0.001:0.001:0.3;
 xvsi        = (0.01:0.04:12) *1e-6;
 x_samples	= [xbvf; xvsi];
 
-ind = randi(1000,3);
+ind = randi(1000,1,4);
+ind = [586 287 888 747 366]; %621 880 747
 
 figure
 for i = 1:length(ind)
@@ -199,16 +200,17 @@ for i = 1:length(ind)
 %     subplot(2,length(ind),2*i-1)
 %     imagesc(x1,x2,Ftot)
 %     set(gca,'YDir','normal')
-
-    subplot(2,length(ind),2*i-1)
+    Ftot_w = Ftot_w ./ sum(sum(Ftot_w));
+    
+    subplot(2,length(ind),i)
     imagesc(x1,x2,Ftot_w)
     hold on
     plot(xt(1),xt(2), 'gx')
     plot(xt_predict(1), xt_predict(2), 'rx')
     set(gca,'YDir','normal')
     
-    subplot(2,length(ind),2*i)
-    contour(x1,x2,Ftot_w,[.5:.1:1.5]);
+    subplot(2,length(ind),length(ind)+i)
+    contour(x1,x2,Ftot_w,[1e-5 1e-9 1e-13 1e-17]);
     hold on
     plot(xt(1),xt(2), 'gx')
     plot(xt_predict(1), xt_predict(2), 'rx')
