@@ -4,10 +4,8 @@ addpath(genpath(fullfile(pwd, 'functions')))
 %% Regression approach Vs Grid search approach
 
 % Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% dico_regression     = 'files/mydicos/16-07-2018_dico_rand_4params_160000signals.mat';
-% dico_grid           = 'files/mydicos/17-07-2018_dico_grid_4params_160000signals.mat';
-dico_regression     = 'files/mydicos/2018-07-23-09:47_rand_91-samples_4-parameters_20000-signals.mat';
-dico_grid           = 'files/mydicos/2018-07-23-09:22_grid_91-samples_4-parameters_20000-signals.mat';
+dico_regression     = 'dictionaries/multidico/2018-07-23-09:47_rand_91-samples_4-parameters_20000-signals.mat';
+dico_grid           = 'dictionaries/multidico/2018-07-23-09:22_grid_91-samples_4-parameters_20000-signals.mat';
 
 repetition          = 1;
 signal_test_number  = 200;

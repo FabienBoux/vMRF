@@ -1,3 +1,14 @@
+% SEQUENCE_INFLUENCE_BIS
+%
+% Using a dictionary composed of MGEFIDSE, MSME and MGE (pre/post) signals,
+% the idea is to compare estimation (average NRMSE distributions) using  
+% each sequence only or a combinaison of sequences
+%
+% Note: due to some errors with dictionaries (BVf interval definition), a
+% line was added to remove some test signals
+%
+% Fabien Boux - 08/2018
+
 
 addpath(genpath(fullfile(pwd, 'functions')))
 
@@ -9,9 +20,9 @@ seq_names       = {'GEFIDSE','MGE','MSME'};
 cstr.Sigma      = 'd';
 Lw              = 1;
 
-coord           = [1 2 3 4];
+coord           = [1 2 3];
 seq_sizes       = [32 32 30];
-signal_test     = 100;
+signal_test     = 1000;
 nb_tests        = 100;
 
 snr_train       = [0 inf];
@@ -62,7 +73,12 @@ for seq = 1:size(mat,1)
         Xtest               = Xregr(rand_perm, nmat(seq,:));
         Ytest               = Yregr(rand_perm, :);
         Xtest               = AddNoise(Xtest , snr_test(1)+(snr_test(2)-snr_test(1))*rand(size(Xtest,1),1), 0);
-
+        %%%%%%%% lines addded due to the specific problem %%%%%%%%%%%%%%%%%%%%%
+        remove_samples      = Ytest(:,1) <= 0.2;
+        Ytest               = Ytest(remove_samples,:);
+        Xtest               = Xtest(remove_samples,:);    
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
         % Prediction
         Ypredict_grid       = EstimateParametersFromGrid(Xtest, Xgrid, Ygrid);
         Ypredict_regr       = EstimateParametersFromModel(Xtest, theta, 0);
@@ -78,7 +94,8 @@ for seq = 1:size(mat,1)
     end
 end
 
-%%
+
+%% NRMSE
 
 figure;
 for i = 1:size(Nrmse_grid,1)
@@ -101,8 +118,41 @@ for i = 1:size(Nrmse_grid,1)
     hold on; line([1 1], ylim, 'LineWidth', 1.5, 'Color', 'k');
     if i == 1
         title('NRMSE histogram - Learning method');
-        legend({'BVf','VSI','T2','ADC',x_dens'Limit of interest'})
+        legend({'BVf','VSI','T2','ADC','Limit of interest'})
     end
 end
 
+%% MAE
+
+figure;
+for i = 1:size(Mae_grid,1)
+    
+ 
+    for c = 1:size(Mae_grid,3)
+        subplot(size(Mae_grid,1),size(Mae_grid,3),size(Mae_grid,3)*(i-1)+c)
+        
+        switch c
+            case 1
+                b = (0:0.00015:0.015) *1e2;
+                hist([squeeze(Mae_grid(i,:,c)); squeeze(Mae_regr(i,:,c))]'*1e2, b)
+                xlim([b(1) b(end)])
+                if i == 1, title('BVf (in %)'); end
+            case 2
+                b = 0:2e-8:2e-6;
+                hist([squeeze(Mae_grid(i,:,c)); squeeze(Mae_regr(i,:,c))]', b)
+                xlim([b(1) b(end)])
+                if i == 1, title('VSI (in µm)'); end
+            case 3
+                b = (0.01:0.001:0.1) * 1e3;
+                hist([squeeze(Mae_grid(i,:,c)); squeeze(Mae_regr(i,:,c))]' *1e3, b)
+                xlim([b(1) b(end)])
+                if i == 1, title('T_2 (in ms)'); end
+            case 4
+                break
+                %TODO
+        end
+    end
+    
+    if i == 1, legend({'Grid search','Regression approach'}); end
+end
 

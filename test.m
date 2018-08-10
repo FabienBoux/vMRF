@@ -6,20 +6,19 @@ addpath(genpath(fullfile(pwd(), 'tools')))
 %% Learning step
 
 % complete 3 sequences
-% file        = 'dictionaries/multidico/2018-07-25-11:22_complex_dico.mat';
+file        = 'dictionaries/multidico/2018-07-25-11:22_complex_dico.mat';
 % only GESFIDSE sequence
-file        = 'dictionaries/multidico/2018-07-25-09:35_32-samples_5-parameters_80000-signals.mat';
+% file        = 'dictionaries/multidico/2018-07-25-09:35_32-samples_5-parameters_80000-signals.mat';
 % file        = 'dictionaries/mydicos/dico_random_220000signals_4parameters.mat';
-coord       = [1 2];
+coord       = [1 2 3 4];
 
 v = randperm(30,16);
 GESFIDSE    = zeros(1,32); %GESFIDSE(11:end)  = 1;
-% MSME        = zeros(1,32); MSME(v)      = 1;
-% MGE         = zeros(1,30); MGE(v(1:end-1)) = 1;
-% remove_samples = logical(repmat([GESFIDSE MSME MGE],1,2));
-remove_samples = logical(repmat(GESFIDSE,1,2));
+MSME        = zeros(1,32); %MSME(v)      = 1;
+MGE         = zeros(1,30); %MGE(v(1:end-1)) = 1;
+remove_samples = logical(repmat([GESFIDSE MSME MGE],1,2));
 
-K           = 6;
+K           = 20;
 Lw          = 0;
 
 cstr.Sigma  = 'd';
@@ -28,9 +27,9 @@ cstr.Gammaw = '';
 
 load(file)
 X           = X(:,~remove_samples);
-snr         = [50 200];
+snr         = [0 inf];
 X           = AddNoise(X, snr(1)+(snr(2)-snr(1))*rand(size(X,1),1), 0);
-[theta, r]	= EstimateInverseFunction(Y(:,[1 2]), X, K, Lw, 100, cstr, 0);
+[theta, r]	= EstimateInverseFunction(Y(:,coord), X, K, Lw, 100, cstr, 0);
 
 
 %% Choosing test signal
@@ -169,24 +168,25 @@ legend([num2str((1:K)') repelem(' - NRMSE = ',K,1) num2str(nrmsek')])
 title(['Mean NRMSE = ' num2str(mean(nrmsek))])
 
 
-%%
+%% Interpretation - test 3
 
 xbvf        = 0.001:0.001:0.3;
 xvsi        = (0.01:0.04:12) *1e-6;
 x_samples	= [xbvf; xvsi];
 
-ind = randi(1000,1,4);
-ind = [586 287 888 747 366]; %621 880 747
+ind         = randi(1000,1,3);
+%ind         = [586 287 888 747 366]; %621 880 747 57 143
+% ind = [559   581 969];
 
 figure
 for i = 1:length(ind)
     yt = X(ind(i),:);
     xt = Y(ind(i),:);
     
-    [x_dens,psi,theta]  = gllim_inverse_dens_modified(yt',theta,ones(size(yt)),x_samples,0);
+    [x_dens,psi,theta]  = gllim_inverse_dens_modified(yt',theta,ones(size(yt')),x_samples,0);
     [xt_predict,alpha]  = gllim_inverse_map(yt',theta,0);
-    x1      = 0:.001:.3;
-    x2      = (0:.001:13) *1e-6;
+    x1      = 0:.0001:.3;
+    x2      = (0:.005:13) *1e-6;
     [X1,X2] = meshgrid(x1,x2);
     Ftot    = zeros(size(X1));
     Ftot_w  = zeros(size(X1));
@@ -202,19 +202,52 @@ for i = 1:length(ind)
 %     set(gca,'YDir','normal')
     Ftot_w = Ftot_w ./ sum(sum(Ftot_w));
     
-    subplot(2,length(ind),i)
+    subplot(3,length(ind),i)
     imagesc(x1,x2,Ftot_w)
     hold on
     plot(xt(1),xt(2), 'gx')
     plot(xt_predict(1), xt_predict(2), 'rx')
     set(gca,'YDir','normal')
     
-    subplot(2,length(ind),length(ind)+i)
+    subplot(3,length(ind),length(ind)+i)
     contour(x1,x2,Ftot_w,[1e-5 1e-9 1e-13 1e-17]);
     hold on
     plot(xt(1),xt(2), 'gx')
     plot(xt_predict(1), xt_predict(2), 'rx')
+    
+    subplot(3,length(ind),2*length(ind)+i)
+    p = .99;
+    acc = ComputeAccuracy({x1, x2}, Ftot_w, p, 1);
+    hold on
+    plot(xt(1),xt(2), 'gx')
+    plot(xt_predict(1), xt_predict(2), 'rx')
+    title([num2str(acc,3) ' (p=' num2str(p) ')'])  
 end
+
+
+%% Interpretation - test 3
+
+figure
+tmp = abs(squeeze(theta.A(:,1,:))');
+
+subplot(211)
+hold on
+plot(max(tmp))
+plot(mean(tmp))
+plot(min(tmp))
+% plot(mean(tmp) + std(tmp))
+% plot(mean(tmp) - std(tmp))
+
+
+tmp = abs(squeeze(theta.A(:,2,:))');
+
+subplot(212)
+hold on
+plot(max(tmp))
+plot(mean(tmp))
+plot(min(tmp))
+% plot(mean(tmp) + std(tmp))
+% plot(mean(tmp) - std(tmp))
 
 
 

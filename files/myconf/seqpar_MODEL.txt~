@@ -1,0 +1,18 @@
+# This file is a detail of simulation parameter names (with unity) 
+# and how find this parameter in the method file
+
+
+####################
+##    Sequence    ##
+####################
+
+Seq.Id          	=   'GESFIDE';
+Seq.Name        	=   '@Seq_nRF';
+Seq.Tacq        	=   [1 2 3 4]; #(in ms) $EffectiveTE
+Seq.TR          	=   100e-3;
+Seq.RF.exc.time     =   [0 25]*1e-3 ;
+Seq.RF.exc.dur      =   [1 0]*1e-3;
+Seq.RF.exc.ang      =   [90 180];
+Seq.RF.exc.pha0     =   [0 90];
+Seq.RF.exc.phainc   =   [0];
+Seq.NbRep           =   1;              

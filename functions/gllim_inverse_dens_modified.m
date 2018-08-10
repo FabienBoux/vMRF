@@ -42,6 +42,7 @@ mu=NaN(L,K);         % Conditional means
 S=NaN(L,L,K);        % Conditional covariance matrices
 logalpha=zeros(1,K); % Conditional log-weights log(p(Z=k|y;theta))
 pXyz=zeros(size(x_samples,2),K); % Probability p(x|y,Z=k;theta)
+% Add by Me
 for k=1:K
     if(verb>=2), fprintf(1,'  k=%d ',k); end
     if(verb>=2), fprintf(1,'AbcG '); end

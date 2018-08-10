@@ -1,17 +1,28 @@
+% SEQUENCE_INFLUENCE
+%
+% Using a dictionary composed of MGEFIDSE, MSME and MGE (pre/post) signals,
+% the idea is to compare estimation (average NRMSE distributions) using  
+% each sequence only or a combinaison of sequences
+%
+% Note: due to some errors with dictionaries (BVf interval definition), a
+% line was added to remove some test signals
+%
+% Fabien Boux - 08/2018
+
 
 addpath(genpath(fullfile(pwd, 'functions')))
 
 % Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-file_grid   	= 'files/multidico/2018-07-25-13:41_complex_dico.mat';
-file_regression	= 'files/multidico/2018-07-25-11:22_complex_dico.mat';
+file_grid   	= 'dictionaries/multidico/2018-07-25-13:41_complex_dico.mat';
+file_regression	= 'dictionaries/multidico/2018-07-25-11:22_complex_dico.mat';
 
-cstr.Sigma      = '';
-Lw              = 1;
+cstr.Sigma      = 'd';
+Lw              = 0;
 
-coord           = [1 2 3];
+coord           = [1 2 3 4];
 seq_sizes       = [32 32 30];
 snr_values      = Inf;
-signal_test     = 200;
+signal_test     = 1000;
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Load dico
@@ -45,6 +56,11 @@ for seq = 1:size(mat,1)
     rand_perm           = randperm(length(Xregr), signal_test);
     Xtest               = Xregr(rand_perm, nmat(seq,:));
     Ytest               = Yregr(rand_perm, :);
+    %%%%%%%% lines addded due to the specific problem %%%%%%%%%%%%%%%%%%%%%
+    remove_samples      = Ytest(:,1) <= 0.2;
+    Ytest               = Ytest(remove_samples,:);
+    Xtest               = Xtest(remove_samples,:);    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Xtest               = AddNoise(Xtest , snr_values, 0);
     
     % Predict using grid

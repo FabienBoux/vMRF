@@ -1,0 +1,22 @@
+# This file is a detail of simulation parameter names (with unity) 
+# and how find this parameter in the method file
+
+
+####################
+##    Sequence    ##
+####################
+
+Seq.Id          	=   'GESFIDE';
+Seq.Name        	=   '@Seq_nRF';
+
+Seq.Tacq        	=   [1 2 3 4];      # acquisition times (in s)      $EffectiveTE
+
+Seq.TR          	=   100e-3;         # repetition time (in s)        $PVM_RepetitionTime
+Seq.NbRep           =   1;              # number of repetition (none)   $PVM_NRepetitions
+
+Seq.RF.exc.time     =   [0 25]*1e-3 ;   # RF execution times (in s)     $
+Seq.RF.exc.dur      =   [1 0]*1e-3;     # RF execution durations (in s) $
+Seq.RF.exc.ang      =   [90 180];       # RF execution angles (in °)    [$ExcPulse1(3) $RefPulse1(3)]
+Seq.RF.exc.pha0     =   [0 90];         # ?
+Seq.RF.exc.phainc   =   [0];            # ?
+
