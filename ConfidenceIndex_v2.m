@@ -1,3 +1,14 @@
+% CONFIDENCE_INDEX_V2
+%
+% The objectiv of this script is to idenbtify if it's possible to predict
+% the quality of the estimations.
+% This script is composed of 2 investigations: both the
+% correlation/relation between real errors and distribution size
+%
+% Note:
+%
+% Fabien Boux - 08/2018
+
 
 addpath(genpath(fullfile(pwd(), 'functions')))
 addpath(genpath(fullfile(pwd(), 'tools')))

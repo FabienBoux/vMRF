@@ -1,3 +1,16 @@
+% CONFIDENCE_INDEX
+%
+% The objectiv of this script is to idenbtify if it's possible to predict
+% the quality of the estimations.
+% This script is composed of 3 investigations:
+%   - first: is plotting real errors vs theta.Gamma
+%   - second: TODO
+%   - third: is plotting the projection weight theta.A
+%
+% Note:
+%
+% Fabien Boux - 08/2018
+
 
 addpath(genpath(fullfile(pwd(), 'functions')))
 addpath(genpath(fullfile(pwd(), 'tools')))
@@ -18,7 +31,7 @@ MSME        = zeros(1,32); %MSME(v)      = 1;
 MGE         = zeros(1,30); %MGE(v(1:end-1)) = 1;
 remove_samples = logical(repmat([GESFIDSE MSME MGE],1,2));
 
-K           = 20;
+K           = 10;
 Lw          = 0;
 
 cstr.Sigma  = 'd';
@@ -248,41 +261,6 @@ plot(mean(tmp))
 plot(min(tmp))
 % plot(mean(tmp) + std(tmp))
 % plot(mean(tmp) - std(tmp))
-
-
-
-%%
-% figure
-% plot(quad_error)
-% hold on; plot(errorG)
-
-disp(mean(quad_error))
-disp(mean(errorG))
-
-% % Generating distribution and estimation
-% [X1,X2] = meshgrid(xbvf,xvsi);
-% F       = zeros(size(X1));
-% for k = 1:K
-%     F = F + alpha(k) * reshape(mvnpdf([X1(:) X2(:)],psi.mu(:,k)',psi.S(:,:,k)),length(xvsi),length(xbvf));
-% end
-% 
-% 
-% % Plotting
-% figure
-% subplot(121)
-% surf(xbvf,xvsi,F);
-% title(['Predict = ' num2str(x_predict(1),3) ' / ' num2str(x_predict(2),3)...
-%     '\newline Real = ' num2str(Y(ind,1),3) ' / ' num2str(Y(ind,2),3)])
-% 
-% subplot(122)
-% imagesc(xbvf,xvsi,F)
-% hold on
-% plot(x_predict(1), x_predict(2),'rx','LineWidth', 2)
-% plot(Y(ind,1), Y(ind,2),'gx','LineWidth', 2)
-% legend({'Prediction','Real value'})
-% set(gca,'YDir','normal')
-
-
 
 
 

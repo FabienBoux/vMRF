@@ -15,14 +15,20 @@ addpath(genpath(fullfile(pwd, 'functions')))
 % Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 file_grid   	= 'dictionaries/multidico/2018-07-25-13:41_complex_dico.mat';
 file_regression	= 'dictionaries/multidico/2018-07-25-11:22_complex_dico.mat';
+seq_names       = {'GEFIDSE','MGE','MSME'};
 
 cstr.Sigma      = 'd';
-Lw              = 0;
+cstr.Gammat     = 'd';
+cstr.Gammaw     = '';
+Lw              = 1;
 
-coord           = [1 2 3 4];
+coord           = [1 2 3];
 seq_sizes       = [32 32 30];
-snr_values      = Inf;
 signal_test     = 1000;
+nb_tests        = 100;
+
+snr_train       = [0 inf];
+snr_test        = [0 inf];
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Load dico
@@ -52,39 +58,103 @@ for seq = 1:size(mat,1)
     
     fprintf(['Combination : ' num2str(seq) '/' num2str(size(mat,1)) '\n'])
     
-    % Generate test signals (adding noise)
-    rand_perm           = randperm(length(Xregr), signal_test);
-    Xtest               = Xregr(rand_perm, nmat(seq,:));
-    Ytest               = Yregr(rand_perm, :);
-    %%%%%%%% lines addded due to the specific problem %%%%%%%%%%%%%%%%%%%%%
-    remove_samples      = Ytest(:,1) <= 0.2;
-    Ytest               = Ytest(remove_samples,:);
-    Xtest               = Xtest(remove_samples,:);    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    Xtest               = AddNoise(Xtest , snr_values, 0);
     
-    % Predict using grid
+    % Select grid signals
     Xgrid               = Xdico(:,nmat(seq,:));
     Ygrid               = Ydico;
-    Ypredict_grid       = EstimateParametersFromGrid(Xtest, Xgrid, Ygrid);
     
-    % Predict using regression
+    % Select trainning data and train model
     Xtrain              = Xregr(:,nmat(seq,:));
+    Xtrain              = AddNoise(Xtrain, snr_train(1)+(snr_train(2)-snr_train(1))*rand(size(Xtrain,1),1), 0);
     Ytrain              = Yregr;
     [theta, ~]          = EstimateInverseFunction(Ytrain, Xtrain, 20, Lw, 100, cstr, 0);
-    Ypredict_regr       = EstimateParametersFromModel(Xtest, theta, 0);
     
-    for i = 1:size(Ygrid,2)
-        Ypredict_regr(Ypredict_regr(:,i) > max(Ygrid(:,i)),i) = nan;
-        Ypredict_regr(Ypredict_regr(:,i) < min(Ygrid(:,i)),i) = nan;
+    for rep = 1:nb_tests
+        % Generate test signals (adding noise)
+        rand_perm           = randperm(length(Xregr), signal_test);
+        Xtest               = Xregr(rand_perm, nmat(seq,:));
+        Ytest               = Yregr(rand_perm, :);
+        Xtest               = AddNoise(Xtest , snr_test(1)+(snr_test(2)-snr_test(1))*rand(size(Xtest,1),1), 0);
+        %%%%%%%% lines addded due to the specific problem %%%%%%%%%%%%%%%%%%%%%
+        remove_samples      = Ytest(:,1) <= 0.2;
+        Ytest               = Ytest(remove_samples,:);
+        Xtest               = Xtest(remove_samples,:);    
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        % Prediction
+        Ypredict_grid       = EstimateParametersFromGrid(Xtest, Xgrid, Ygrid);
+        Ypredict_regr       = EstimateParametersFromModel(Xtest, theta, 0);
+
+        for i = 1:size(Ygrid,2)
+            Ypredict_regr(Ypredict_regr(:,i) > max(Ygrid(:,i)),i) = nan;
+            Ypredict_regr(Ypredict_regr(:,i) < min(Ygrid(:,i)),i) = nan;
+        end
+
+        % Evaluate estimations
+        [Rmse_grid(seq,rep,:), Nrmse_grid(seq,rep,:), Mae_grid(seq,rep,:)] = EvaluateEstimation(Ytest, Ypredict_grid, Ygrid);
+        [Rmse_regr(seq,rep,:), Nrmse_regr(seq,rep,:), Mae_regr(seq,rep,:)] = EvaluateEstimation(Ytest, Ypredict_regr, Ytrain);
     end
-    
-    % Evaluate estimations
-    [Rmse_grid(seq,:), Nrmse_grid(seq,:), Mae_grid(seq,:)] = EvaluateEstimation(Ytest, Ypredict_grid, Ygrid);
-    [Rmse_regr(seq,:), Nrmse_regr(seq,:), Mae_regr(seq,:)] = EvaluateEstimation(Ytest, Ypredict_regr, Ytrain);
 end
 
 
+%% NRMSE
 
+figure;
+for i = 1:size(Nrmse_grid,1)
+    subplot(size(Nrmse_grid,1),2,2*i-1)
+    hist(squeeze(Nrmse_grid(i,:,:)), 0:0.01:1.4)
+    xlim([0 1.4])
+    hold on; line([1 1], ylim, 'LineWidth', 1.5, 'Color', 'k');
+    if i == 1
+        title('NRMSE histogram - Grid search method');
+        legend({'BVf','VSI','T2','ADC','Limit of interest'})
+        ylabel(seq_names)
+    else
+        ylabel(mat(i,:))
+    end
+    
+    
+    subplot(size(Nrmse_grid,1),2,2*i)
+    hist(squeeze(Nrmse_regr(i,:,:)), 0:0.01:1.4)
+    xlim([0 1.4])
+    hold on; line([1 1], ylim, 'LineWidth', 1.5, 'Color', 'k');
+    if i == 1
+        title('NRMSE histogram - Learning method');
+        legend({'BVf','VSI','T2','ADC','Limit of interest'})
+    end
+end
 
+%% MAE
+
+figure;
+for i = 1:size(Mae_grid,1)
+    
+ 
+    for c = 1:size(Mae_grid,3)
+        subplot(size(Mae_grid,1),size(Mae_grid,3),size(Mae_grid,3)*(i-1)+c)
+        
+        switch c
+            case 1
+                b = (0:0.00015:0.015) *1e2;
+                hist([squeeze(Mae_grid(i,:,c)); squeeze(Mae_regr(i,:,c))]'*1e2, b)
+                xlim([b(1) b(end)])
+                if i == 1, title('BVf (in %)'); end
+            case 2
+                b = 0:2e-8:2e-6;
+                hist([squeeze(Mae_grid(i,:,c)); squeeze(Mae_regr(i,:,c))]', b)
+                xlim([b(1) b(end)])
+                if i == 1, title('VSI (in µm)'); end
+            case 3
+                b = (0.01:0.001:0.1) * 1e3;
+                hist([squeeze(Mae_grid(i,:,c)); squeeze(Mae_regr(i,:,c))]' *1e3, b)
+                xlim([b(1) b(end)])
+                if i == 1, title('T_2 (in ms)'); end
+            case 4
+                break
+                %TODO
+        end
+    end
+    
+    if i == 1, legend({'Grid search','Regression approach'}); end
+end
 

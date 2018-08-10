@@ -1,6 +1,11 @@
-
-
-% On compare la projection aux signaux 
+% PROJECTION_INFLUENCE
+%
+% We are investigating on the projection of each subspace. Some
+% interrested plots here
+%
+% Note: 
+%
+% Fabien Boux - 08/2018
 
 addpath(genpath(fullfile(pwd(), 'functions')))
 addpath(genpath(fullfile(pwd(), 'tools')))

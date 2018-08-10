@@ -12,7 +12,7 @@ function [X_noisy, real_snr] = AddNoise(X, snr, verb)
 narginchk(2, 3);
 if nargin == 2, verb = 0; end
 
-X_noisy = abs(X + randn(size(X)) .* (max(X, [], 2) ./ snr));
+X_noisy = abs(X + randn(size(X)) .* repmat(max(X, [], 2) ./ snr, 1,size(X,2)));
 
 real_snr = 1 ./ std(X - X_noisy);
 

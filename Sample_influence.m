@@ -1,5 +1,10 @@
-
-% On regarde l'influence du nombre de paramètres
+% SAMPLE_INFLUENCE
+%
+% We are investigated on the influence of the sample number
+%
+% Note:
+%
+% Fabien Boux - 08/2018
 
 addpath(genpath(fullfile(pwd(), 'functions')))
 addpath(genpath(fullfile(pwd(), 'tools')))

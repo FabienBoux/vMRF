@@ -1,3 +1,13 @@
+% SEQUENCE_INFLUENCE_V2
+%
+% Using dictionaries composed of MGEFIDSE, MSME and MGE (pre/post) signals,
+% the idea is to compare estimation (average NRMSE distributions) using  
+% each sequence only. See SEQUENCE_INFLUENCE.m for more.
+%
+% Note:
+%
+% Fabien Boux - 08/2018
+
 
 addpath(genpath(fullfile(pwd, 'functions')))
 
@@ -7,15 +17,18 @@ ratio           = 0;
 
 seq_names       = {'MGEFIDSE','MSME','MGE'};
                   % First = random / second = grid
-seq_files       = {{'files/multidico/2018-07-25-09:35_32-samples_5-parameters_80000-signals',...
-                    'files/multidico/2018-07-25-11:58_32-samples_5-parameters_80000-signals'},...
-                   {'files/multidico/2018-07-25-10:05_32-samples_5-parameters_80000-signals',...
-                    'files/multidico/2018-07-25-12:31_32-samples_5-parameters_80000-signals'},...
-                   {'files/multidico/2018-07-25-11:22_30-samples_5-parameters_80000-signals',...
-                    'files/multidico/2018-07-25-13:41_30-samples_5-parameters_80000-signals'}};
+seq_files       = {{'dictionaries/multidico/2018-07-25-09_35_32-samples_5-parameters_80000-signals',...
+                    'dictionaries/multidico/2018-07-25-11_58_32-samples_5-parameters_80000-signals'},...
+                   {'dictionaries/multidico/2018-07-25-10_05_32-samples_5-parameters_80000-signals',...
+                    'dictionaries/multidico/2018-07-25-12_31_32-samples_5-parameters_80000-signals'},...
+                   {'dictionaries/multidico/2018-07-25-11_22_30-samples_5-parameters_80000-signals',...
+                    'dictionaries/multidico/2018-07-25-13_41_30-samples_5-parameters_80000-signals'}};
 seq_sizes       = [32 32 30];
 
 cstr.Sigma      = 'd';
+cstr.Gammat     = 'd';
+cstr.Gammaw     = '';
+K               = 20;
 Lw              = 1;
 
 signal_test     = 100;
@@ -43,9 +56,9 @@ for seq = 1:length(seq_files)
     load(seq_files{seq}{1})
     if ratio == 1, X = X(:,1:end/2) ./ X(:,end/2+1:end); end
     Xtrain              = X;
-    Xtrain              = [Xtrain; AddNoise(Xtrain, snr_train(1)+(snr_train(2)-snr_train(1))*rand(size(Xtrain,1),1), 0)];
-    Ytrain              = [Y(:,coord); Y(:,coord)];
-    [theta, ~]          = EstimateInverseFunction(Ytrain, Xtrain, 20, Lw, 100, cstr, 0);
+    Xtrain              = AddNoise(Xtrain, snr_train(1)+(snr_train(2)-snr_train(1))*rand(size(Xtrain,1),1), 0);
+    Ytrain              = Y(:,coord);
+    [theta, ~]          = EstimateInverseFunction(Ytrain, Xtrain, K, Lw, 100, cstr, 0);
    
     for rep = 1:nb_tests
         % Generate test signals
@@ -71,7 +84,7 @@ for seq = 1:length(seq_files)
     clear X Y
 end
 
-%%
+%% Disp
 
 for i = 1:size(Nrmse_grid,1)
     fprintf('NRMSE of sequence %s :\n', seq_names{i})
