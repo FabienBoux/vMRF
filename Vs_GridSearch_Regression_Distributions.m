@@ -1,6 +1,7 @@
 
 addpath(genpath(fullfile(pwd, 'functions')))
 
+
 %% Regression approach Vs Grid search approach
 
 % Load data
@@ -75,6 +76,7 @@ end
 [Rmse_grid, Nrmse_grid, Mae_grid]	= EvaluateEstimation(Ytest, Ypredict_grid, Ygrid_eff);
 [Rmse_reg,  Nrmse_reg,  Mae_reg]    = EvaluateEstimation(Ytest, Ypredict_reg,  Yregression_eff);
 [Rmse_mean, Nrmse_mean, Mae_mean]	= EvaluateEstimation(Ytest, Ypredict_mean, Yregression_eff);
+
 
 %% Display : version 3D
 figure

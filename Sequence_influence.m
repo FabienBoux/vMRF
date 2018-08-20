@@ -20,9 +20,10 @@ seq_names       = {'GEFIDSE','MGE','MSME'};
 cstr.Sigma      = 'd';
 cstr.Gammat     = 'd';
 cstr.Gammaw     = '';
-Lw              = 1;
+Lw              = 0;
+K               = 20;
 
-coord           = [1 2 3];
+coord           = [1 2 3 4];
 seq_sizes       = [32 32 30];
 signal_test     = 1000;
 nb_tests        = 100;
@@ -30,6 +31,7 @@ nb_tests        = 100;
 snr_train       = [0 inf];
 snr_test        = [0 inf];
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 % Load dico
 load(file_regression)
@@ -51,13 +53,13 @@ for i = 1:length(seq_sizes)-1
     mat         = [mat; unique(perms(vect), 'rows')];
 end
 for i = 1:size(mat,1), nmat(i,:) = repelem(mat(i,:), seq_sizes); end
-nmat   	= logical(repmat(nmat, 1,2));
+%nmat   	= logical(repmat(nmat, 1,2));
+nmat   	= logical([nmat zeros(size(nmat))]);
 
 
 for seq = 1:size(mat,1)
     
     fprintf(['Combination : ' num2str(seq) '/' num2str(size(mat,1)) '\n'])
-    
     
     % Select grid signals
     Xgrid               = Xdico(:,nmat(seq,:));
@@ -67,7 +69,7 @@ for seq = 1:size(mat,1)
     Xtrain              = Xregr(:,nmat(seq,:));
     Xtrain              = AddNoise(Xtrain, snr_train(1)+(snr_train(2)-snr_train(1))*rand(size(Xtrain,1),1), 0);
     Ytrain              = Yregr;
-    [theta, ~]          = EstimateInverseFunction(Ytrain, Xtrain, 20, Lw, 100, cstr, 0);
+    [theta,~]           = EstimateInverseFunction(Ytrain, Xtrain, K, Lw, 100, cstr, 0);
     
     for rep = 1:nb_tests
         % Generate test signals (adding noise)
@@ -75,11 +77,11 @@ for seq = 1:size(mat,1)
         Xtest               = Xregr(rand_perm, nmat(seq,:));
         Ytest               = Yregr(rand_perm, :);
         Xtest               = AddNoise(Xtest , snr_test(1)+(snr_test(2)-snr_test(1))*rand(size(Xtest,1),1), 0);
-        %%%%%%%% lines addded due to the specific problem %%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%% lines addded due to the specific problem %%%%%%%%%%%%%%%%%
         remove_samples      = Ytest(:,1) <= 0.2;
         Ytest               = Ytest(remove_samples,:);
         Xtest               = Xtest(remove_samples,:);    
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         % Prediction
         Ypredict_grid       = EstimateParametersFromGrid(Xtest, Xgrid, Ygrid);

@@ -29,7 +29,7 @@ v = randperm(30,16);
 GESFIDSE    = zeros(1,32); %GESFIDSE(11:end)  = 1;
 MSME        = zeros(1,32); %MSME(v)      = 1;
 MGE         = zeros(1,30); %MGE(v(1:end-1)) = 1;
-remove_samples = logical(repmat([GESFIDSE MSME MGE],1,2));
+% remove_samples = logical(repmat([GESFIDSE MSME MGE],1,2));
 
 K           = 10;
 Lw          = 0;
@@ -39,7 +39,9 @@ cstr.Gammat = 'd';
 cstr.Gammaw = '';
 
 load(file)
-X           = X(:,~remove_samples);
+if exist('remove_samples','var')
+    X           = X(:,~remove_samples);
+end
 snr         = [0 inf];
 X           = AddNoise(X, snr(1)+(snr(2)-snr(1))*rand(size(X,1),1), 0);
 [theta, r]	= EstimateInverseFunction(Y(:,coord), X, K, Lw, 100, cstr, 0);
