@@ -24,7 +24,7 @@ Model.geo.res           =   64;         % Dimension of the lattice
 Model.geo.path          =   '/tmp';     % Path where geometry are save/load
 
 Model.geo.vasc.Id       =   1;          % Id # of vascular geometry
-Model.geo.vasc.Vf       =   [0.02];     % Blood volume fraction (%) 0.025;%
+Model.geo.vasc.Vf       =   [0.025];     % Blood volume fraction (%) 0.025;%
 Model.geo.vasc.N        =   10;        % Number of vessels
 Model.geo.vasc.R        =   [5] *1e-6;  % Radius of the vessels (m)
 Model.geo.vasc.Inter    =   1e-6;       % (m) Interspace between vessels (-1 generates a cartesian grid if number of vessel is squared)

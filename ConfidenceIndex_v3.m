@@ -15,11 +15,11 @@ addpath(genpath(fullfile(pwd(), 'tools')))
 %% Learning step
 
 % complete 3 sequences
-file        = 'dictionaries/multidico/2018-07-25-11:22_complex_dico.mat';
+file        = 'dictionaries/multidico/18-08-21/2018-08-22-09:53_32-samples_4-parameters_36000-signals.mat';
 % only GESFIDSE sequence
 % file        = 'dictionaries/multidico/2018-07-25-09:35_32-samples_5-parameters_80000-signals.mat';
 
-coord       = [1 2 3 4];
+coord       = [1 2 3];
 snr         = [100 500];
 
 K           = 20;
@@ -40,8 +40,9 @@ X           = AddNoise(X, snr(1)+(snr(2)-snr(1))*rand(size(X,1),1), 0);
 xbvf        = 0.001:0.001:0.3;
 xvsi        = (0.01:0.04:12) *1e-6;
 xt2         = (1:1:300) *1e-3;
-xadc        = (503:3:1400) *1e-12;
-x_samples	= [xbvf; xvsi; xt2; xadc];
+%xadc        = (503:3:1400) *1e-12;
+% x_samples	= [xbvf; xvsi; xt2; xadc];
+x_samples	= [xbvf; xvsi; xt2];
 
 ind         = randi(1000,1,1); %278
 
@@ -104,11 +105,12 @@ end
 xbvf        = 0.001:0.001:0.3;
 xvsi        = (0.01:0.04:12) *1e-6;
 xt2         = (1:1:300) *1e-3;
-xadc        = (503:3:1400) *1e-12;
-x_samples	= [xbvf; xvsi; xt2; xadc];
+%xadc        = (503:3:1400) *1e-12;
+% x_samples	= [xbvf; xvsi; xt2; xadc];
+x_samples	= [xbvf; xvsi; xt2];
 
 ind         = randi(1000,1,10);
-ind         = [446 160 134 983 1000 674];
+% ind         = [446 160 134 983 1000 674];
 
 for i = 1:length(ind)    
     yt = X(ind(i),:);
@@ -117,7 +119,7 @@ for i = 1:length(ind)
     [x_dens,psi,theta]  = gllim_inverse_dens_modified(yt',theta,ones(size(yt')),x_samples,0);
     [xt_predict,alpha]  = gllim_inverse_map(yt',theta,0);
     x1      = 0:.001:.3;
-    x2      = (0:.05:13) *1e-6;
+    x2      = (0:.01:13) *1e-6;
     [X1,X2] = meshgrid(x1,x2);
     Ftot    = zeros(size(X1));
     for k = 1:K

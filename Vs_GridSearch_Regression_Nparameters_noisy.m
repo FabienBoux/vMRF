@@ -7,17 +7,20 @@ display = 0;
 %% Regression approach Vs Grid search approach
 
 % Load data
-file_dico_grid        = 'files/04-Apr-2018_64-samples_4-parameters_185367-signals.mat';
-file_dico_regression  = 'files/dico_random_180000signals_MGEFIDSEprepost.mat';
+file_dico_grid	= 'dictionaries/multidico/2018-07-25-11:58_32-samples_5-parameters_80000-signals.mat';
+file_dico_regr  = 'dictionaries/multidico/2018-07-25-09:35_32-samples_5-parameters_80000-signals.mat';
 
 nb_signal   = 10000;
 lw          = 0;
-cstr.Sigma  = '';
-coord       = [1 2];
+cstr.Sigma  = 'd';
+cstr.Gammat = 'd';
+cstr.Gammaw = '';
+
+coord       = [1 2 3 4];
 
 snr_values = [inf 100 20 5];
 
-load(file_dico_regression)
+load(file_dico_regr)
 Xreg        = abs(X);
 Yreg        = Y(:,coord);
 
@@ -27,7 +30,7 @@ Ygrid       = Y(1:length(Xreg),coord);
 clear X Y
 
 for rep = 1:1
-    for dic = 1:1:5
+    for dic = 1:1:3
         
         fprintf(['Repetition ' num2str(rep) ' - dic ' num2str(dic) '\n'])
         
@@ -59,10 +62,10 @@ for rep = 1:1
         
         for iter = 1:length(snr_values)
             
-            Xregression_eff     = AddNoise(Xregression_eff , snr_values(iter), 0);
+            Xregression_eff	= AddNoise(Xregression_eff , snr_values(iter), 0);
         
             Xtest_noisy     = AddNoise(Xtest , snr_values(iter), 0);
-            snr(iter,:,rep) = 1 ./ std(Xtest_noisy - Xtest);
+            snr(iter,:,rep) = mean(1 ./ std(Xtest_noisy - Xtest));
 
             % Compute prediction
             Ypredict_grid       = EstimateParametersFromGrid(Xtest_noisy, Xgrid_eff, Ygrid_eff);
@@ -110,7 +113,6 @@ for i = 1:length(snr_values)
 end
 title('Coordinate 1')
 ylabel('MAE'); xlabel('Dictionary sizes')
-xlim([500 180000])
 
 
 subplot(222)
@@ -121,7 +123,6 @@ for i = 1:length(snr_values)
 end
 title('Coordinate 2')
 ylabel('MAE'); xlabel('Dictionary sizes')
-xlim([500 180000])
 legend({'Grid - SNR = Inf', 'Regression - SNR = Inf', 'Grid - SNR = 100', 'Regression - SNR = 100', 'Grid - SNR = 20', 'Regression - SNR = 20', 'Grid - SNR = 5', 'Regression - SNR = 5'})
 
 subplot(223)
@@ -132,7 +133,6 @@ for i = 1:length(snr_values)
 end
 title('Coordinate 1')
 ylabel('RMSE'); xlabel('Dictionary sizes')
-xlim([500 180000])
 
 subplot(224)
 for i = 1:length(snr_values)
@@ -142,8 +142,6 @@ for i = 1:length(snr_values)
 end
 title('Coordinate 2')
 ylabel('RMSE'); xlabel('Dictionary sizes')
-xlim([500 180000])
-
 
 %% Plotting
 
@@ -157,7 +155,6 @@ end
 xlabel('Dictionary size'); ylabel('NRMSE'); 
 legend({'Grid - SNR = Inf', 'Regression - SNR = Inf', 'Grid - SNR = 100', 'Regression - SNR = 100', 'Grid - SNR = 20', 'Regression - SNR = 20', 'Grid - SNR = 5', 'Regression - SNR = 5'})
 title('Mean NRMSE')
-xlim([500 180000])
 
 subplot(1,2,2);
 for i = 1:length(snr_values)
@@ -167,4 +164,3 @@ end
 semilogx(dico_len, [1 1 1 1], 'k', 'linewidth', 1)
 xlabel('Dictionary size'); ylabel('Ratio'); legend({'SNR = Inf', 'SNR = 100','SNR = 20','SNR = 5'});
 title('Ratio : Grid / Random')
-xlim([2500 180000])

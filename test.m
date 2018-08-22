@@ -1,4 +1,4 @@
-
+% On essaye de regarder sans le post 
 
 % Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 file_grid   	= 'dictionaries/multidico/2018-07-25-13:41_complex_dico.mat';
@@ -49,7 +49,7 @@ nmat   	= logical([nmat zeros(size(nmat))]);
 
 
 
-for seq = 1:length(seq_sizes)
+for seq = 1:size(nmat,1)
     
     fprintf(['Iter ' num2str(seq) '\n'])
     
