@@ -13,8 +13,8 @@
 addpath(genpath(fullfile(pwd, 'functions')))
 
 % Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-file_grid   	= 'dictionaries/multidico/18-08-22-2/2018-08-22-17:14-24_complex_dico_2.mat';
-file_regression	= 'dictionaries/multidico/18-08-22-2/2018-08-22-17:05-59_complex_dico_2.mat';
+file_grid   	= 'dictionaries/multidico/18-08-23/2018-08-22-17:39-32_complex_dico.mat';
+file_regression	= 'dictionaries/multidico/18-08-23/2018-08-22-17:27-28_complex_dico.mat';
 seq_names       = {'GEFIDSE','MGE','MSME'};
 
 cstr.Sigma      = 'd';

@@ -1,6 +1,6 @@
-function [Kbest, Kopti] = FindOptimalK(Xtrain, Ytrain, Xtest, Ytest, Kmax, Lw, maxiter, cstr, verb)
+function [Kbest, Kopti] = FindOptimalK(Xtrain, Ytrain, Xtest, Ytest, K, Lw, maxiter, cstr, verb)
 
-if ~exist('Kmax','var'),    Kmax = 50; end
+if ~exist('Kmax','var'),    K = 15:25; end
 if ~exist('Lw','var'),      Lw = 0; end
 if ~exist('maxiter','var'), maxiter = 200; end
 if ~exist('cstr','var'),    cstr.Sigma  = 'd'; cstr.Gammat = 'd'; cstr.Gammaw = ''; end
@@ -10,12 +10,12 @@ if ~exist('verb','var'),    verb = 1; end
 %% Compute the Kmax regression
 
 
-Nrmse   = zeros(Kmax, size(Ytrain,2));
+Nrmse   = zeros(length(K), size(Ytrain,2));
 
-parfor_progress(Kmax);
-parfor k = 1:Kmax
+parfor_progress(length(K));
+parfor k = 1:length(K)
     
-    [theta,~] 	= EstimateInverseFunction(Ytrain, Xtrain, k, Lw, maxiter, cstr, 0);
+    [theta,~] 	= EstimateInverseFunction(Ytrain, Xtrain, K(k), Lw, maxiter, cstr, 0);
     Ypredict	= EstimateParametersFromModel(Xtest, theta, 0);
 
     for i = 1:size(Ytrain,2)
@@ -32,8 +32,9 @@ parfor_progress(0);
 
 %% Find the best K
 
-[~,Kbest]   = min(mean(Nrmse,2));
-Kopti = Kbest;
+[~,l]   = min(mean(Nrmse,2));
+Kbest   = K(l);
+Kopti   = Kbest;
 
 % % Compute some model selection criteria
 % %L = ; %maximum value of the likelihood function for the model

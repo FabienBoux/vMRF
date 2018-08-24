@@ -1,0 +1,17 @@
+
+
+Model.geo.res       = [64];
+Model.geo.vasc.N    = [20];
+
+nb_signal = 15*15*15;
+dim = 3;
+p = net(sobolset(dim),nb_signal)';
+
+Model.geo.vasc.Vf   = repmat(0.01 + 0.14 *p(1,:), 1,2);
+Model.geo.vasc.R    = repmat([1 + 14 *p(2,:)]*1e-6, 1,2);
+Model.phy.ees.T2    = repmat([20 + 299 *p(3,:)]*1e-3, 1,2);
+
+Model.phy.B0        = [9.4];
+Model.phy.DH2O      = [1000]*1e-12;
+
+Model.phy.vasc.khi  = [0.4*ones(1,nb_signal) (0.4+7.2)*ones(1,nb_signal)]*1e-6;-6;

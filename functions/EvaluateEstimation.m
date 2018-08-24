@@ -1,4 +1,4 @@
-function [Rmse, Nrmse, Mae] = EvaluateEstimation(Ytrue, Yestim, Ytrain)
+function [Rmse, Nrmse, Mae, Nmae] = EvaluateEstimation(Ytrue, Yestim, Ytrain)
 
 N = size(Ytrue,2);
 
@@ -9,4 +9,5 @@ for i = 1:N
     Rmse(i)  = nanmean( ( Ytrue(:,i) - Yestim(:,i) ).^2 )^.5;
     Nrmse(i) = Rmse(i) / nanmean( ( Ytrue(:,i) - nanmean(Ytrain(:,i)) ).^2 ).^0.5;
     Mae(i)   = nanmean( abs(Ytrue(:,i) - Yestim(:,i)) );
+    Nmae(i)  = nanmean( abs(Ytrue(:,i) - Yestim(:,i)) ) ./ mean(Ytrue(:,i));
 end
